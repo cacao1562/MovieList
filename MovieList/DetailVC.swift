@@ -39,6 +39,8 @@ class DetailVC : UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+        tableView.deselectRow(at: indexPath, animated: false)
+        
         if (indexPath.row == 0) {
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "dCell", for: indexPath) as! DetailCell

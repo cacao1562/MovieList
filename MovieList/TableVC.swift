@@ -100,6 +100,8 @@ class TableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UIT
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        tableView.deselectRow(at: indexPath, animated: false)
+        
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "detailVC") as! DetailVC
         
         var count = 0

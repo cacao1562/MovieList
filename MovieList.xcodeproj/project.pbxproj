@@ -82,8 +82,6 @@
 				4D73DAF921C28FCC00BDDD7A /* TableVC.swift */,
 				4D8E7ADF21C399E500A2FD12 /* CollectionVC.swift */,
 				4DE3BD1921C509330089D9ED /* DetailVC.swift */,
-				4D8E7AE821C40BD500A2FD12 /* MovieCell.swift */,
-				4D8E7AE921C40BD500A2FD12 /* MovieCell.xib */,
 				4D73DAFB21C28FCC00BDDD7A /* Main.storyboard */,
 				4D73DAFE21C28FCE00BDDD7A /* Assets.xcassets */,
 				4D73DB0021C28FCE00BDDD7A /* LaunchScreen.storyboard */,
@@ -95,6 +93,8 @@
 		4D8E7AE521C3A2D300A2FD12 /* Cell */ = {
 			isa = PBXGroup;
 			children = (
+				4D8E7AE821C40BD500A2FD12 /* MovieCell.swift */,
+				4D8E7AE921C40BD500A2FD12 /* MovieCell.xib */,
 				4D8E7AE121C39BAD00A2FD12 /* CollectionCell.swift */,
 				4D8E7AE221C39BAD00A2FD12 /* CollectionCell.xib */,
 				4DD981E421C639A70033F064 /* DetailCell.swift */,
