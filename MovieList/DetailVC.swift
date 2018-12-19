@@ -58,6 +58,7 @@ class DetailVC : UIViewController, UITableViewDelegate, UITableViewDataSource {
             cell.synopsis.text = detailArr.synopsis
             cell.director.text = detailArr.director
             cell.actor.text = detailArr.actor
+            cell.actor.sizeToFit()
         
             cell.star1.image = starImage[0]
             cell.star2.image = starImage[1]
@@ -89,25 +90,29 @@ class DetailVC : UIViewController, UITableViewDelegate, UITableViewDataSource {
         
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: false)
+    }
+    
     func setStarimg(rating : Double)  {
         
-        var value = Int(rating)
-        var a = value / 2
-        var b = value % 2
+        let value = Int(rating)
+        let a = value / 2
+        let b = value % 2
        
         if(b == 0) {
-            for i in 0..<a {
+            for _ in 0..<a {
                 starImage.append(UIImage(named: "star1")!)
             }
-            for i in 0..<5-a {
+            for _ in 0..<5-a {
                 starImage.append(UIImage(named: "star2")!)
             }
         }else {
-            for i in 0..<a {
+            for _ in 0..<a {
                 starImage.append(UIImage(named: "star1")!)
             }
             starImage.append(UIImage(named: "star3")!)
-            for i in 0..<5 - a + 1 {
+            for _ in 0..<5 - a + 1 {
                 starImage.append(UIImage(named: "star2")!)
             }
         }
@@ -120,23 +125,23 @@ class DetailVC : UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         commentStarImage.removeAll()
         
-        var value = Int(rating)
-        var a = value / 2
-        var b = value % 2
+        let value = Int(rating)
+        let a = value / 2
+        let b = value % 2
        
         if(b == 0) {
-            for i in 0..<a {
+            for _ in 0..<a {
                 commentStarImage.append(UIImage(named: "star1")!)
             }
-            for i in 0..<5-a {
+            for _ in 0..<5-a {
                 commentStarImage.append(UIImage(named: "star2")!)
             }
         }else {
-            for i in 0..<a {
+            for _ in 0..<a {
                 commentStarImage.append(UIImage(named: "star1")!)
             }
             commentStarImage.append(UIImage(named: "star3")!)
-            for i in 0..<5 - a + 1 {
+            for _ in 0..<5 - a + 1 {
                 commentStarImage.append(UIImage(named: "star2")!)
             }
         }

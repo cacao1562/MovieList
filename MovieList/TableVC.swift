@@ -14,14 +14,17 @@ class TableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UIT
     
     var movieinfoArr : [MovieInfo] = []
     var thumbImageArr : [UIImage?] = []
-
+    var alertController : UIAlertController?
+    var spinner : UIActivityIndicatorView!
     var tabcheck = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.tabBarController?.delegate = self
-
+        
+        alertController = setAlert()
+        
         callApi(typeNum: 0)
     
         outletTableView.delegate = self
@@ -32,6 +35,10 @@ class TableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UIT
         
         self.navigationItem.title = "예매율"
         
+        spinner = UIActivityIndicatorView(style: .gray)
+        spinner.hidesWhenStopped = true
+        spinner.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 60)
+    
     }
     
     @IBAction func sortButton(_ sender: Any) {
@@ -57,12 +64,17 @@ class TableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UIT
     
     func callApi(typeNum type : Int) {
         
+        self.present(alertController!, animated: true)
+        
         self.movieinfoArr.removeAll()
         self.thumbImageArr.removeAll()
         
         NetworkManager.getMovies(typeNumber : type) { result, error  in
             
-            self.showError(error: error)
+            if (error) {
+                self.showError(error: error)
+            }
+            
                 for row in result.movies {
                 
                     self.movieinfoArr.append(row)
@@ -70,10 +82,14 @@ class TableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UIT
                 
                 }
                 self.outletTableView.reloadData()
-            
+            self.alertController?.dismiss(animated: true, completion: nil)
         }
         
     }
+    
+   
+    
+    
     
     
     
@@ -110,7 +126,6 @@ class TableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UIT
             
             self.showError(error: error)
             vc.commentsArr = result.comments
-            print("comments compleet")
             count += 1
             if (count == 2) {
                 self.navigationController?.pushViewController(vc, animated: true)
@@ -121,7 +136,6 @@ class TableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UIT
             
             self.showError(error: error)
             vc.detailArr = result
-            print("detail complet")
             count += 1
             if (count == 2) {
                 self.navigationController?.pushViewController(vc, animated: true)
@@ -129,6 +143,31 @@ class TableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UIT
             
         }
         
+    }
+    
+   
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        
+        let offset = scrollView.contentOffset
+        let bounds = scrollView.bounds
+        let size = scrollView.contentSize
+        let inset = scrollView.contentInset
+        
+        let y = offset.y + bounds.size.height - inset.bottom
+        let h = size.height
+        let reloadDistance = CGFloat(30.0)
+        
+        if y > h + reloadDistance {
+//            print("fetch more data")
+            outletTableView.tableFooterView = spinner
+            spinner.startAnimating()
+            
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+                self.outletTableView.reloadData()
+                self.outletTableView.tableFooterView? = UIView()
+            }
+            
+        }
     }
     
     
@@ -163,14 +202,16 @@ class TableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UIT
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         
         if (tabcheck) {
-            print("should select = \(tabBarController.selectedIndex)" )
+
             if (tabBarController.selectedIndex == 1) {
                 
                 let nav = viewController as! UINavigationController
+                
                 if let vc = nav.topViewController as? CollectionVC {
+                    
                     vc.movieinfoArr = self.movieinfoArr
                     vc.thumbImageArr = self.thumbImageArr
-                    print("vc = \(vc.movieinfoArr.count)")
+                    
                     tabcheck = false
                 }
                 
@@ -189,12 +230,40 @@ class TableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UIT
 
 extension UIViewController {
     
+    var indicatorTag : Int { return 123 }
+    
     func showError(error : Bool) {
-        
+    
         if (error) {
             let alert = UIAlertController(title: "알림", message: "데이터를 가져오지 못했습니다.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
             self.present(alert, animated: true)
         }
     }
+    
+    func setAlert() -> UIAlertController {
+        
+        let alert = UIAlertController(title: "Downloading Data", message: "", preferredStyle: .alert)
+        
+        let vc = UIViewController()
+        vc.preferredContentSize = CGSize(width: 200, height: 50) //뷰컨트롤러 사이즈
+        
+        let space = UIView()
+        space.frame = CGRect(x: 0, y: 0, width: 200, height: 50)
+        
+        let indicator = UIActivityIndicatorView(style: .gray)
+        indicator.transform = CGAffineTransform(scaleX: 2, y: 2)
+        indicator.center = space.center
+        indicator.tag = self.indicatorTag
+        indicator.startAnimating()
+        
+        space.addSubview(indicator)
+        vc.view.addSubview(space)
+        
+        alert.setValue(vc, forKeyPath: "contentViewController")
+      
+        return alert
+    }
+   
+    
 }

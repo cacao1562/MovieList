@@ -13,15 +13,20 @@ class CollectionVC : UIViewController, UICollectionViewDelegate, UICollectionVie
    
     var movieinfoArr : [MovieInfo] = []
     var thumbImageArr : [UIImage?] = []
+    var alertController : UIAlertController?
+    var footerView : UICollectionReusableView!
     
     @IBOutlet weak var outletCollectionView: UICollectionView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        alertController = setAlert()
+        
         let nib = UINib(nibName: "CollectionCell", bundle: nil)
         outletCollectionView.register(nib, forCellWithReuseIdentifier: "cCell")
         self.navigationItem.title = "예매율"
+        
     }
     
     @IBAction func sortButton(_ sender: Any) {
@@ -46,16 +51,15 @@ class CollectionVC : UIViewController, UICollectionViewDelegate, UICollectionVie
    
     func callApi(typeNum type : Int) {
         
+        self.present(alertController!, animated: true)
+        
         self.movieinfoArr.removeAll()
         self.thumbImageArr.removeAll()
         
         NetworkManager.getMovies(typeNumber : type) { result , error  in
             
             if (error) {
-                
-                let alert = UIAlertController(title: "알림", message: "데이터를 가져오지 못했습니다.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
-                self.present(alert, animated: true)
+                self.showError(error: error)
             }
             
             for row in result.movies {
@@ -65,6 +69,8 @@ class CollectionVC : UIViewController, UICollectionViewDelegate, UICollectionVie
                 
             }
             self.outletCollectionView.reloadData()
+            
+            self.alertController?.dismiss(animated: true, completion: nil)
             
         }
         
@@ -98,11 +104,11 @@ class CollectionVC : UIViewController, UICollectionViewDelegate, UICollectionVie
         
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "detailVC") as! DetailVC
         var count = 0
+        
         NetworkManager.getComments(movieId: self.movieinfoArr[indexPath.row].id) { (result, error) in
             
             self.showError(error: error)
             vc.commentsArr = result.comments
-            print("comments compleet")
             count += 1
             if (count == 2) {
                 self.navigationController?.pushViewController(vc, animated: true)
@@ -113,7 +119,6 @@ class CollectionVC : UIViewController, UICollectionViewDelegate, UICollectionVie
             
             self.showError(error: error)
             vc.detailArr = result
-            print("detail complet")
             count += 1
             if (count == 2) {
                 self.navigationController?.pushViewController(vc, animated: true)
@@ -127,10 +132,45 @@ class CollectionVC : UIViewController, UICollectionViewDelegate, UICollectionVie
         return CGSize(width: (self.view.frame.width - 20 ) / 2, height: (self.view.frame.height - 30 ) / 2 )
     }
     
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        
+        let offset = scrollView.contentOffset
+        let bounds = scrollView.bounds
+        let size = scrollView.contentSize
+        let inset = scrollView.contentInset
+        
+        let y = offset.y + bounds.size.height - inset.bottom
+        let h = size.height
+        let reloadDistance = CGFloat(30.0)
+        
+        if y > h + reloadDistance {
+//            print("fetch more data")
+            footerView.isHidden = false
+
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+                self.outletCollectionView.reloadData()
+                self.footerView.isHidden = true
+            }
+            
+        }
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        
+//        if (kind == UICollectionView.elementKindSectionFooter) {
+        footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "fCell", for: indexPath)
+        footerView.isHidden = true
+        
+        return footerView
+
+    }
+    
+    
     
     func getThumbnailImage( _ index : Int) -> UIImage {
         
-        var mvo = self.movieinfoArr[index]
+        let mvo = self.movieinfoArr[index]
         
         if thumbImageArr.isEmpty{
             

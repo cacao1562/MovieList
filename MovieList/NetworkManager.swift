@@ -86,10 +86,10 @@ class NetworkManager {
         let defaultSession = URLSession(configuration: .default)
         
         let mUrl = "http://connect-boxoffice.run.goorm.io/movies?order_type=\(type)"
-        print("movies url = " + mUrl )
+//        print("movies url = " + mUrl )
         
         guard let url = URL(string: "\(mUrl)") else {
-            print("URL is nil")
+            print("Movies URL is nil")
             return
         }
         
@@ -134,10 +134,10 @@ class NetworkManager {
         let defaultSession = URLSession(configuration: .default)
         
         let mUrl = "http://connect-boxoffice.run.goorm.io/movie?id=\(id)"
-        print("derail url = " + mUrl )
+//        print("derail url = " + mUrl )
         
         guard let url = URL(string: "\(mUrl)") else {
-            print("URL is nil")
+            print("Detail URL is nil")
             return
         }
 
@@ -181,10 +181,10 @@ class NetworkManager {
         let defaultSession = URLSession(configuration: .default)
         
         let mUrl = "http://connect-boxoffice.run.goorm.io/comments?movie_id=\(id)"
-        print("comments url = " + mUrl )
+//        print("comments url = " + mUrl )
         
         guard let url = URL(string: "\(mUrl)") else {
-            print("URL is nil")
+            print("Comments URL is nil")
             return
         }
         
